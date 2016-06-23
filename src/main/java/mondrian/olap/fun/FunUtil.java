@@ -24,6 +24,7 @@ import org.apache.commons.collections.ComparatorUtils;
 import org.apache.commons.collections.comparators.ComparatorChain;
 import org.apache.log4j.Logger;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -1284,29 +1285,43 @@ public class FunUtil extends Util {
     }
 
     public static Object max(
-        Evaluator evaluator,
-        TupleList members,
-        Calc exp)
-    {
-        SetWrapper sw = evaluateSet(evaluator, members, exp);
-        if (sw.errorCount > 0) {
-            return Double.NaN;
-        } else {
-            final int size = sw.v.size();
-            if (size == 0) {
-                return Util.nullValue;
+            Evaluator evaluator,
+            TupleList members,
+            Calc exp)
+        {
+            SetWrapper sw = evaluateSet(evaluator, members, exp);
+            if (sw.errorCount > 0) {
+                return Double.NaN;
             } else {
-                Double max = (Double) sw.v.get(0);
-                for (int i = 1; i < size; i++) {
-                    Double iValue = (Double) sw.v.get(i);
-                    if (iValue > max) {
-                        max = iValue;
-                    }
+                final int size = sw.v.size();
+                if (size == 0) {
+                    return Util.nullValue;
+                } else {
+                	
+                	Object o = sw.v.get(0);
+                	if (o instanceof Timestamp){
+                		List uncasted = sw.v;
+                		return getMaxTimestamp(uncasted);
+                		
+                	} else {
+                		Double max = (Double) o;
+                		for (int i = 1; i < size; i++) {
+                			Double iValue = (Double) sw.v.get(i);
+                			if (iValue > max) {
+                				max = iValue;
+                			}
+                		}
+                		return max;
+                	}
                 }
-                return max;
             }
         }
-    }
+
+    	public static Timestamp getMaxTimestamp(List uncasted) {
+    		List<Timestamp> values = (List<Timestamp>) uncasted;
+    		Timestamp max = Collections.max(values);
+    		return max;
+    	}
 
     static Object var(
         Evaluator evaluator,
