@@ -1299,7 +1299,7 @@ public class FunUtil extends Util {
                 } else {
                 	
                 	Object o = sw.v.get(0);
-                	if (o instanceof Timestamp){
+                	if (hasTimestamp(sw.v)){
                 		List uncasted = sw.v;
                 		return getMaxTimestamp(uncasted);
                 		
@@ -1317,9 +1317,23 @@ public class FunUtil extends Util {
             }
         }
 
+        public static boolean hasTimestamp(List uncasted){
+            for (Object o : uncasted)
+            {
+                if (o instanceof Timestamp)
+                    return true;
+            }
+            return false;
+        }
+
     	public static Timestamp getMaxTimestamp(List uncasted) {
-    		List<Timestamp> values = (List<Timestamp>) uncasted;
-    		Timestamp max = Collections.max(values);
+    		List<Timestamp> values = new ArrayList<Timestamp>();
+            for (Object o : uncasted)
+            {
+                if (o instanceof Timestamp)
+                    values.add((Timestamp)o);
+            }
+            Timestamp max = Collections.max(values);
     		return max;
     	}
 
